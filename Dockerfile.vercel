@@ -1,0 +1,10 @@
+FROM dunglas/frankenphp:latest-alpine
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN install-php-extensions pdo_mysql bcmath opcache zip intl
+WORKDIR /app
+COPY . .
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN chown -R www-data:www-data storage bootstrap/cache
+ENV PORT=80
+EXPOSE 80
+CMD ["frankenphp", "php-server", "--listen", ":80", "--public-dir", "public"]
